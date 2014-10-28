@@ -27,7 +27,7 @@ public class StationsDB {
  
 	public StationsDB(Context context){
 		//On créer la BDD et sa table
-		base = new SQLiteDB(context, NOM_BDD, null, VERSION_BDD);
+		base = new SQLiteDB(context, NOM_BDD, null, VERSION_BDD);		
 	}
  
 	public void open(){
@@ -72,10 +72,27 @@ public class StationsDB {
  
 	public Station getStationWithName(String name){
 		//Récupère dans un Cursor les valeur correspondant à une station contenue dans la BDD
-		Cursor c = bdd.query(TABLE_STATIONS, new String[] {COL_ID, COL_NAME, COL_CODE, COL_COORDX, COL_COORDY}, COL_NAME + " LIKE \"" + name +"\"", null, null, null, null);
+		Cursor c = bdd.query(TABLE_STATIONS, new String[] {COL_ID, COL_NAME, COL_CODE, COL_COORDX, COL_COORDY}, COL_NAME + " LIKE \"%" + name + "%\"", null, null, null, null);
 		return cursorToStation(c);
 	}
- 
+	
+	public String[] getAllStationsName(){
+		Cursor c = bdd.query(TABLE_STATIONS, new String[] {COL_ID, COL_NAME, COL_CODE, COL_COORDX, COL_COORDY}, null, null, null, null, null);
+		if(c.moveToFirst()){
+			int i = 0;
+			String[] stations = new String[c.getCount()];
+			do {
+				String station;
+                station = c.getString(NUM_COL_NAME);
+                stations[i] = station;
+                i++;
+            } while (c.moveToNext());
+			
+			return stations;
+		}
+		return null;
+	}
+ 	
 	//Cette méthode permet de convertir un cursor en un livre
 	private Station cursorToStation(Cursor c){
 		//si aucun élément n'a été retourné dans la requête, on renvoie null
@@ -97,5 +114,9 @@ public class StationsDB {
  
 		//On retourne le livre
 		return station;
+	}
+	
+	public void deleteAllRows(Context context){
+		context.deleteDatabase(NOM_BDD);
 	}
 }

@@ -9,13 +9,35 @@
     tools:context="com.example.justontime.FirstPage" >
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/testAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="26dp"
-        android:layout_marginTop="38dp"
-        android:text="Test Géolocation" />
+        android:layout_marginLeft="38dp"
+        android:layout_marginTop="30dp"
+        android:text="address : " />    
+
+    <Button
+        android:id="@+id/SearchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/destination"
+        android:layout_marginTop="17dp"
+        android:layout_toRightOf="@+id/testAddress"
+        android:onClick="searchAddress"
+        android:text="Search" />
+
+    <AutoCompleteTextView
+        android:id="@+id/destination"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/testAddress"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="65dp"
+        android:ems="10" >
+
+        <requestFocus />
+    </AutoCompleteTextView>
 
 </RelativeLayout>

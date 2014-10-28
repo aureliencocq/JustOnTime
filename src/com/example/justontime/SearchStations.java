@@ -55,12 +55,6 @@ public class SearchStations {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-                /*BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    response.append(line);
-                }*/
-                System.out.println("le nom du noeud est : " + doc.getNodeName());
             }
         } catch (ClientProtocolException e) {
             // TODO Auto-generated catch block

@@ -42,8 +42,9 @@ public class LoadApp extends ActionBarActivity {
         }
         
         StationsDB stationsDB = new StationsDB(this);
-        stationsDB.open(); 
-        
+        stationsDB.deleteAllRows(this);
+        stationsDB = new StationsDB(this);
+        stationsDB.open();         
         NodeList nList = stations.getElementsByTagName("StopArea");
         Station currentStation;
         int[] coords = {0, 0};
