@@ -76,6 +76,23 @@ public class StationsDB {
 		return cursorToStation(c);
 	}
 	
+	public Station[] getAllStations(){		
+		Cursor c = bdd.query(TABLE_STATIONS, new String[] {COL_ID, COL_NAME, COL_CODE, COL_COORDX, COL_COORDY}, null, null, null, null, null);
+		if(c.moveToFirst()){
+			Station[] stations = new Station[c.getCount()];
+			int i = 0;
+			do {
+				Station station;
+                station = new Station(c.getString(NUM_COL_NAME), c.getString(NUM_COL_CODE), new int[] {c.getInt(NUM_COL_COORDX), c.getInt(NUM_COL_COORDY)});
+                stations[i] = station;
+                i++;
+            } while (c.moveToNext());			
+			
+			return stations;
+		}
+		return null;
+	}
+	
 	public String[] getAllStationsName(){
 		Cursor c = bdd.query(TABLE_STATIONS, new String[] {COL_ID, COL_NAME, COL_CODE, COL_COORDX, COL_COORDY}, null, null, null, null, null);
 		if(c.moveToFirst()){

@@ -2,6 +2,10 @@ package com.example.justontime;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 
@@ -15,12 +19,15 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.graphics.Color;
 import android.location.Address;
@@ -69,12 +76,63 @@ public class FirstPage extends ActionBarActivity implements LocationListener {
         
         stationsDB.close();
 		
-		// Get a reference to the AutoCompleteTextView in the layout
-		AutoCompleteTextView textView = (AutoCompleteTextView) findViewById(R.id.destination);
-		// Get the string array		
-		// Create the adapter and set it to the AutoCompleteTextView 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, DESTINATIONS);
-		textView.setAdapter(adapter);
+     // Get a reference to the AutoCompleteTextView in the layout
+     		final AutoCompleteTextView textViewDest = (AutoCompleteTextView) findViewById(R.id.destination);
+     		final AutoCompleteTextView textViewDep = (AutoCompleteTextView) findViewById(R.id.departure);
+     		// Get the string array		
+     		// Create the adapter and set it to the AutoCompleteTextView 
+     		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, DESTINATIONS);
+     		textViewDest.setAdapter(adapter);
+     		textViewDep.setAdapter(adapter);
+     		textViewDest.addTextChangedListener(new TextWatcher() {
+
+     		    @Override
+     		    public void onTextChanged(CharSequence s, int start, int before, int count) {
+     		    	String val = textViewDest.getText() + "";
+     				int test = adapter.getPosition(val);
+     				 if(adapter.getCount() == 0){
+     					 textViewDest.setError("Destination invalide");
+     				 }
+     				 else{
+     					 textViewDest.setError(null);
+     				 }
+     		    }
+
+     		    @Override
+     		    public void beforeTextChanged(CharSequence s, int start, int count, int after) {                
+
+     		    }
+
+     		    @Override
+     		    public void afterTextChanged(Editable s) {
+
+     		    }
+     		});		
+     		
+     		textViewDep.addTextChangedListener(new TextWatcher() {
+
+     		    @Override
+     		    public void onTextChanged(CharSequence s, int start, int before, int count) {
+     		    	String val = textViewDep.getText() + "";
+     				int test = adapter.getPosition(val);
+     				 if(adapter.getCount() == 0){
+     					 textViewDep.setError("Départ invalide");
+     				 }
+     				 else{
+     					 textViewDep.setError(null);
+     				 }
+     		    }
+
+     		    @Override
+     		    public void beforeTextChanged(CharSequence s, int start, int count, int after) {                
+
+     		    }
+
+     		    @Override
+     		    public void afterTextChanged(Editable s) {
+
+     		    }
+     		});		
 		
 	    populateTextViews();
 	    ActionBar actionBar = getSupportActionBar();
@@ -148,7 +206,7 @@ public class FirstPage extends ActionBarActivity implements LocationListener {
 		Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 		
 		Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-		TextView address = (TextView)findViewById(R.id.testText);
+		TextView address = (TextView)findViewById(R.id.testAddress);
 		
 		try {
 			  List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
@@ -161,6 +219,27 @@ public class FirstPage extends ActionBarActivity implements LocationListener {
 				   }				   
 				   address.setText(strReturnedAddress.toString());
 				   cityPosition = returnedAddress.getLocality();
+				   
+				   StationsDB stationsDB = new StationsDB(this);
+			       stationsDB.open();
+			       Station currentStation = stationsDB.getStationWithName("gare de " + cityPosition);
+			       			       			    	   			      
+			       if(currentStation == null){
+			    	   Station[] stations = stationsDB.getAllStations();
+			    	   currentStation = stations[0];
+			    	   int[] gap = {(int)(latitude - currentStation.getCoordinates()[0]), (int)(longitude - currentStation.getCoordinates()[1])};
+			    	   int[] tmpGap = new int[2];
+			    	   for(int i = 1; i < stations.length; i++){				    		   
+			    		   tmpGap[0] = (int)(latitude - stations[i].getCoordinates()[0]);
+			    		   tmpGap[1] = (int)(longitude - stations[i].getCoordinates()[1]);
+			    		   if(tmpGap[0] < gap[0] && tmpGap[1] < gap[1]){
+			    			   currentStation = stations[i];
+			    			   gap = tmpGap;
+			    		   }
+			    	   }
+			       }
+			       
+			       ((EditText)findViewById(R.id.departure)).setText(currentStation.getName());
 			  }
 			  else{
 				  address.setText("no address found !");
@@ -208,25 +287,32 @@ public class FirstPage extends ActionBarActivity implements LocationListener {
 		
 	}
 	
-	public void searchAddress(View v){		
-		String destination = ((EditText)findViewById(R.id.destination)).getText().toString();
-		StationsDB stationsDB = new StationsDB(this);
-        stationsDB.open();
-        
-        //this.setStartStation(stationsDB.getStationWithName("gare de " + cityPosition));
-        this.setStartStation(stationsDB.getStationWithName("gare de Lille Flandres"));
-        this.setDestStation(stationsDB.getStationWithName(destination)); 
-        Log.d("code : ", this.getStartStation().getCode());
-        
-        stationsDB.close();
-        
-        new LoadAllSchedule().execute();
-        
-        while(schedule == null){
-        	
-        }         
-        
-        Log.d("Result : ", schedule.getChildNodes().item(0).getNodeName());
+	public void searchAddress(View v){
+		if(((EditText)findViewById(R.id.destination)).getText() != null){
+			String destination = ((EditText)findViewById(R.id.destination)).getText().toString();
+			String source = ((EditText)findViewById(R.id.departure)).getText().toString();
+			StationsDB stationsDB = new StationsDB(this);
+	        stationsDB.open();
+	        
+	        //this.setStartStation(stationsDB.getStationWithName(source));
+	        this.setStartStation(stationsDB.getStationWithName(source));
+	        this.setDestStation(stationsDB.getStationWithName(destination)); 
+	        Log.d("code : ", this.getStartStation().getCode());
+	        
+	        stationsDB.close();
+	        
+	        new LoadAllSchedule().execute();
+	        
+	        while(schedule == null){
+	        	
+	        }         
+	        
+	        NodeList childNodes = schedule.getElementsByTagName("StopTime").item(0).getChildNodes();
+	        String hours = childNodes.item(2).getTextContent();
+	        String minutes = childNodes.item(3).getTextContent();
+	        
+	        Log.d("Time : ", hours + " - " + minutes);
+		}
 	}
 	
 	public void setSchedule(Document doc){
@@ -316,13 +402,25 @@ public class FirstPage extends ActionBarActivity implements LocationListener {
         	sb.append(getStartStation().getCode());
         	sb.append("&DestinationExternalCode=");
         	sb.append(getDestStation().getCode());
-        	//sb.append("&Time=17|15");
+        	sb.append("&Time=17|15");
         	//sb.append(getTime());
-        	//sb.append("&Date=2014|11|15");
-        	//sb.append(getDate());
-        	sb.append("&Time=17|15&Date=2014|11|15");
+        	sb.append("&Date=2014|11|15");
+        	//sb.append(getDate());        	
         	sb.append("&nbstop=1");
-            HttpGet httpGet = new HttpGet(sb.toString());
+        	
+            HttpGet httpGet = null;		
+            URL url;
+			try {
+				url = new URL(sb.toString());
+				URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());	            
+	            httpGet = new HttpGet(uri);
+			} catch (MalformedURLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}            
 
             HttpResponse httpResponse;
             InputStream is = null;
