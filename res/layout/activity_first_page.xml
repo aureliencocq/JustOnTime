@@ -1,4 +1,5 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:fbutton="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,36 +9,89 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.justontime.FirstPage" >
 
-    <TextView
-        android:id="@+id/testAddress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="38dp"
-        android:layout_marginTop="30dp"
-        android:text="address : " />    
-
-    <Button
-        android:id="@+id/SearchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/destination"
-        android:layout_marginTop="17dp"
-        android:layout_toRightOf="@+id/testAddress"
-        android:onClick="searchAddress"
-        android:text="Search" />
-
     <AutoCompleteTextView
         android:id="@+id/destination"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/testAddress"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="65dp"
-        android:ems="10" >
+        android:layout_marginTop="24dp"
+        android:ems="10" />
+    
+    <ImageView
+        android:id="@+id/stationIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/destination"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
+        android:layout_toLeftOf="@+id/testText"
+        android:adjustViewBounds="false"
+        android:src="@drawable/icon_station" >
 
-        <requestFocus />
-    </AutoCompleteTextView>
+	</ImageView>
+
+    <TextView
+        android:id="@+id/testAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="72dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:textSize="26sp" />
+
+    <Button
+        android:id="@+id/SearchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/departAddress"
+        android:layout_alignRight="@+id/testText"
+        android:layout_below="@+id/departure"
+        android:layout_marginTop="53dp"
+        android:background="#A1006B"
+        android:onClick="searchAddress"
+        android:text="@string/search"
+        android:textColor="#FFFFFF" />
+
+    <AutoCompleteTextView
+        android:id="@+id/departure"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/destination"
+        android:layout_below="@+id/departAddress"
+        android:layout_marginTop="32dp"
+        android:ems="10" />
+
+    <EditText
+        android:id="@+id/testText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/SearchButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp"
+        android:clickable="false"
+        android:ems="10"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/departure"
+        android:layout_below="@+id/destination"
+        android:layout_marginTop="25dp"
+        android:layout_gravity="center"
+        android:layout_toLeftOf="@+id/testText"
+        android:adjustViewBounds="false"
+        android:src="@drawable/icon_station" />
+
+    <TextView
+        android:id="@+id/departAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/testAddress"
+        android:layout_below="@+id/destination"
+        android:layout_marginTop="34dp"
+        android:textSize="26sp" />
 
 </RelativeLayout>

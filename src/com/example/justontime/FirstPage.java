@@ -17,7 +17,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -70,6 +75,28 @@ public class FirstPage extends ActionBarActivity implements LocationListener {
 		// Create the adapter and set it to the AutoCompleteTextView 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, DESTINATIONS);
 		textView.setAdapter(adapter);
+		
+	    populateTextViews();
+	    ActionBar actionBar = getSupportActionBar();
+	    actionBar.show();
+	    
+	}
+	
+	private void populateTextViews(){
+		//style of textview testAddress
+		TextView tv = (TextView)findViewById(R.id.testAddress);
+		Spannable wordtoSpan = new SpannableString("Ajouter une gare de Destination :");        
+		wordtoSpan.setSpan(new ForegroundColorSpan(Color.parseColor("#3F3F3F")), 0, 18, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		wordtoSpan.setSpan(new ForegroundColorSpan(Color.parseColor("#6E267B")), 20, 31, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		tv.setText(wordtoSpan);
+			    
+		//style of textview departAddress
+		 TextView tv2 = (TextView)findViewById(R.id.departAddress);
+		Spannable wordtoSpan2 = new SpannableString("Ajouter une gare de Départ :");        
+		wordtoSpan2.setSpan(new ForegroundColorSpan(Color.parseColor("#3F3F3F")), 0, 18, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		wordtoSpan2.setSpan(new ForegroundColorSpan(Color.parseColor("#6E267B")), 20, 26, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		tv2.setText(wordtoSpan2);
+		
 	}
 
 	@Override
@@ -121,7 +148,7 @@ public class FirstPage extends ActionBarActivity implements LocationListener {
 		Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 		
 		Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-		TextView address = (TextView)findViewById(R.id.testAddress);
+		TextView address = (TextView)findViewById(R.id.testText);
 		
 		try {
 			  List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
