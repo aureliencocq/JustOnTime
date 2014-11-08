@@ -12,8 +12,9 @@
     <string name="new_location">New Location : Latitude = %1$s, Longitude = %2$s, Altitude = %3$s avec une précision de %4$s mètres </string>
     <string name="title_activity_splash_screen">SplashScreen</string>
     <string name="splash_screen">splash screen</string>
-     
     <string name="search">Rechercher</string>
-    
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_test">Test</string>
+    <string name="title_activity_test2">Test2</string>
 
 </resources>
