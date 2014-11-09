@@ -8,5 +8,35 @@
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- API 14 theme customizations can go here. -->
     </style>
+    
+    <style name="Theme.Justontime" parent="@style/Theme.AppCompat.Light">
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_justontime</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu.Justontime</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Justontime</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Justontime</item>
+        <item name="android:actionDropDownStyle">@style/DropDownNav.Justontime</item>
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.Justontime</item>
+        <item name="android:actionModeBackground">@drawable/cab_background_top_justontime</item>
+        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_justontime</item>
+        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Justontime</item>
+        
+        
+    </style>
+
+    <style name="ActionBar.Solid.Justontime" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="android:background">@drawable/ab_solid_justontime</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_justontime</item>
+        <item name="android:backgroundSplit">@drawable/ab_bottom_solid_justontime</item>
+    </style>
+
+    <style name="ActionBar.Transparent.Justontime" parent="@style/Widget.AppCompat.Light.ActionBar">
+        <item name="android:background">@drawable/ab_transparent_justontime</item>
+    </style>
+    
+    <!-- this style is only referenced in a Light.DarkActionBar based theme -->
+    <style name="Theme.Justontime.Widget" parent="@style/Theme.AppCompat">
+        <item name="android:popupMenuStyle">@style/PopupMenu.Justontime</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Justontime</item>
+    </style>
 
 </resources>

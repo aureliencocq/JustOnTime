@@ -24,6 +24,7 @@ import org.xml.sax.SAXException;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -64,6 +65,8 @@ public class NewRoute extends Fragment implements LocationListener{
 	// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 	private static final String ARG_PARAM1 = "param1";
 	private static final String ARG_PARAM2 = "param2";
+	
+	public static final String PREFS_NAME = "routes_prefs";
 
 	// TODO: Rename and change types of parameters
 	private String mParam1;
@@ -385,7 +388,13 @@ public class NewRoute extends Fragment implements LocationListener{
 	        String hours = childNodes.item(2).getTextContent();
 	        String minutes = childNodes.item(3).getTextContent();
 	        
-	        Log.d("Time : ", hours + " - " + minutes);
+	        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+	        SharedPreferences.Editor editor = settings.edit();
+	        String route = source + "-" + destination + "-" + hours + "-" + minutes;
+	        editor.putString("route", route);
+
+	        // Commit the edits!
+	        editor.commit();
 		}
 	}
 	

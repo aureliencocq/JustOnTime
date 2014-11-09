@@ -5,25 +5,30 @@ import android.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 
 import android.app.ActionBar;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
 public class FirstPage extends FragmentActivity implements ActionBar.TabListener, NewRoute.OnFragmentInteractionListener, Favorites.OnFragmentInteractionListener, NextTrains.OnFragmentInteractionListener {
-
+	
 	private ViewPager viewPager;
 	private TabsPagerAdapter mAdapter;
 	private ActionBar actionBar;
 	// Tab titles
-	private String[] tabs = { "Nouveau", "Favoris", "Prochains trains" };
+	private String[] tabs = { "Nouveau", "Favoris", "Horaires" };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_first_page);
+				
 
 		// Initilization
 		viewPager = (ViewPager) findViewById(R.id.pager);
 		actionBar = getActionBar();
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setDisplayShowTitleEnabled(false);
 		mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 
 		viewPager.setAdapter(mAdapter);
