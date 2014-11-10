@@ -1,14 +1,42 @@
 package com.example.justontime;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import com.example.justontime.NewRoute.LoadAllSchedule;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass. Activities that contain this fragment
@@ -30,6 +58,10 @@ public class Favorites extends Fragment {
 	private String mParam2;
 
 	private OnFragmentInteractionListener mListener;
+	ListView listView ;
+	Station destStation;
+	Station depStation;
+	Document schedule;
 
 	/**
 	 * Use this factory method to create a new instance of this fragment using
@@ -69,11 +101,115 @@ public class Favorites extends Fragment {
 			Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		View v = inflater.inflate(R.layout.fragment_favorites, container, false);
+		listView = (ListView) v.findViewById(R.id.routes);
 		
 		SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
-	    
+	    int size = settings.getInt("indexPref", 0);
+	    ArrayList<String> fullRoute = new ArrayList<String>();
+	    for(int i = 0; i < size; i++){
+	    	String str = settings.getString("route" + i, "Pas de favori");
+		    String[] route = str.split("-");
+		    String formatRoute = route[0].split("de")[1].replaceFirst(" ", "") + " - " + route[1].split("de")[1].replaceFirst(" ", "");
+		    if(checkIfExist(fullRoute, formatRoute) == false){
+		    	fullRoute.add(formatRoute);
+		    }
+	    }
 		
+	    
+	    LazyAdapter adapter = new LazyAdapter(this.getActivity(), fullRoute);
+
+
+        // Assign adapter to ListView
+        listView.setAdapter(adapter); 
+		
+        // ListView Item Click Listener
+        listView.setOnItemClickListener(new OnItemClickListener() {
+
+              @Override
+              public void onItemClick(AdapterView<?> parent, View view,
+                 int position, long id) {
+                
+               
+               // ListView Clicked item value
+               String  itemValue = (String) listView.getItemAtPosition(position);
+                  
+               String departure = "gare de " + itemValue.split(" - ")[0];
+               String destination = "gare de " + itemValue.split(" - ")[1];
+               
+               searchAddress(departure, destination);
+              }
+
+         }); 
+        
 		return v;
+	}
+	
+	public void searchAddress(String departure, String destination){					
+			StationsDB stationsDB = new StationsDB(this.getActivity());
+	        stationsDB.open();
+	        
+	        Station sourceStation = stationsDB.getStationWithName(departure);
+	        this.setStartStation(sourceStation);
+	        Station destStation = stationsDB.getStationWithName(destination);
+	        this.setDestStation(destStation); 
+	        
+	        stationsDB.close();
+	        
+	        new LoadAllSchedule().execute();
+	        
+	        while(schedule == null){
+	        	
+	        }         
+	        
+	        NodeList childNodes = schedule.getElementsByTagName("StopTime").item(0).getChildNodes();
+	        String hours = childNodes.item(2).getTextContent();
+	        String minutes = childNodes.item(3).getTextContent();
+	        
+	        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+	        int indexPref = settings.getInt("indexPref", 0);
+	        SharedPreferences.Editor editor = settings.edit();
+	        String route = sourceStation.getName() + "-" + destStation.getName() + "-" + hours + "-" + minutes;
+	        editor.putString("route" + indexPref, route);
+	        indexPref++;
+	        editor.putInt("indexPref", indexPref);
+	        // Commit the edits!
+	        editor.commit();
+	        
+	        getActivity().getActionBar().setSelectedNavigationItem(2);
+	}
+	
+	private void setDestStation(Station destStation2) {
+		destStation = destStation2;
+		
+	}
+
+	private void setStartStation(Station sourceStation) {
+		depStation = sourceStation;
+		
+	}
+	
+	private Station getDestStation() {
+		return destStation;
+	}
+
+	private Station getStartStation() {
+		return depStation;
+	}
+	
+	private void setSchedule(Document doc) {
+		schedule = doc;
+		
+	}
+
+	private boolean checkIfExist(ArrayList<String> data, String element){		
+		
+		for(int i = 0; i < data.size(); i++){
+			if(element.equals(data.get(i))){
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	// TODO: Rename method, update argument and hook method into UI event
@@ -113,5 +249,76 @@ public class Favorites extends Fragment {
 		// TODO: Update argument type and name
 		public void onFragmentInteraction(Uri uri);
 	}
+	
+	class LoadAllSchedule extends AsyncTask<String, String, String> {
+		 
+        /**
+         * getting All products from url
+         * @return 
+         * */
+        protected String doInBackground(String... args) {        	
+        	DefaultHttpClient httpClient = new DefaultHttpClient(); 
+        	StringBuilder sb = new StringBuilder();
+        	sb.append("http://ms.api.ter-sncf.com/?action=nextdeparture&StopAreaExternalCode=");
+        	sb.append(getStartStation().getCode());
+        	sb.append("&DestinationExternalCode=");
+        	sb.append(getDestStation().getCode());
+        	sb.append("&Time=17|15");
+        	//sb.append(getTime());
+        	sb.append("&Date=2014|11|15");
+        	//sb.append(getDate());        	
+        	sb.append("&nbstop=1");
+        	
+            HttpGet httpGet = null;		
+            URL url;
+			try {
+				url = new URL(sb.toString());
+				URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());	            
+	            httpGet = new HttpGet(uri);
+			} catch (MalformedURLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}            
+
+            HttpResponse httpResponse;
+            InputStream is = null;
+			try {
+				httpResponse = httpClient.execute(httpGet);
+				HttpEntity httpEntity = httpResponse.getEntity();
+	            is = httpEntity.getContent();
+			} catch (ClientProtocolException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 
+			DocumentBuilder builder;
+			Document doc = null;
+			try {
+				builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+				doc = builder.parse(is);
+				doc.getDocumentElement().normalize();
+				setSchedule(doc);				
+			} catch (ParserConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				catch (SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+			return doc.toString();
+			
+        }		
+		
+    }
 
 }

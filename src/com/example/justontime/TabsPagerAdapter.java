@@ -1,13 +1,13 @@
 package com.example.justontime;
 
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-public class TabsPagerAdapter extends FragmentPagerAdapter {
+/*public class TabsPagerAdapter extends FragmentPagerAdapter {
 
-	public TabsPagerAdapter(FragmentManager fm) {
-		super(fm);
+	public TabsPagerAdapter(FragmentManager fragmentManager) {
+		super(fragmentManager);
 	}
 
 	@Override
@@ -34,4 +34,4 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
 		return 3;
 	}
 
-}
+}*/

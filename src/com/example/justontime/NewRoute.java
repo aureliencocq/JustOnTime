@@ -35,13 +35,12 @@ import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -366,15 +365,16 @@ public class NewRoute extends Fragment implements LocationListener{
 	}
 	
 	public void searchAddress(View v){
-		if(((EditText)getView().findViewById(R.id.destination)).getText() != null){
+		if(((EditText)getView().findViewById(R.id.destination)).getText() != null && ((EditText)getView().findViewById(R.id.departure)).getText() != null){
 			String destination = ((EditText)getView().findViewById(R.id.destination)).getText().toString();
 			String source = ((EditText)getView().findViewById(R.id.departure)).getText().toString();
 			StationsDB stationsDB = new StationsDB(this.getActivity());
 	        stationsDB.open();
 	        
-	        //this.setStartStation(stationsDB.getStationWithName(source));
-	        this.setStartStation(stationsDB.getStationWithName(source));
-	        this.setDestStation(stationsDB.getStationWithName(destination)); 
+	        Station sourceStation = stationsDB.getStationWithName(source);
+	        this.setStartStation(sourceStation);
+	        Station destStation = stationsDB.getStationWithName(destination);
+	        this.setDestStation(destStation); 
 	        
 	        stationsDB.close();
 	        
@@ -389,12 +389,22 @@ public class NewRoute extends Fragment implements LocationListener{
 	        String minutes = childNodes.item(3).getTextContent();
 	        
 	        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+	        int indexPref = settings.getInt("indexPref", 0);
 	        SharedPreferences.Editor editor = settings.edit();
-	        String route = source + "-" + destination + "-" + hours + "-" + minutes;
-	        editor.putString("route", route);
-
+	        String route = sourceStation.getName() + "-" + destStation.getName() + "-" + hours + "-" + minutes;
+	        editor.putString("route" + indexPref, route);
+	        indexPref++;
+	        editor.putInt("indexPref", indexPref);
 	        // Commit the edits!
 	        editor.commit();
+	        
+	        ((EditText)getView().findViewById(R.id.destination)).setText("");
+	        ((EditText)getView().findViewById(R.id.departure)).setText("");
+	        
+	        getActivity().getActionBar().setSelectedNavigationItem(2);
+		}
+		else{
+			Toast.makeText(this.getActivity(), "Trajet innexistant", Toast.LENGTH_LONG).show();
 		}
 	}
 	

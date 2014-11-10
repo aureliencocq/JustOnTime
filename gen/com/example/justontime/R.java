@@ -1095,30 +1095,33 @@ containing a value of this type.
         public static final int btn_cab_done_pressed_justontime=0x7f020060;
         public static final int cab_background_bottom_justontime=0x7f020061;
         public static final int cab_background_top_justontime=0x7f020062;
-        public static final int ic_launcher=0x7f020063;
-        public static final int ic_launcher_perso=0x7f020064;
-        public static final int icon_station=0x7f020065;
-        public static final int list_focused_justontime=0x7f020066;
-        public static final int list_pressed_justontime=0x7f020067;
-        public static final int menu_dropdown_panel_justontime=0x7f020068;
-        public static final int progress_bg_justontime=0x7f020069;
-        public static final int progress_horizontal_justontime=0x7f02006a;
-        public static final int progress_primary_justontime=0x7f02006b;
-        public static final int progress_secondary_justontime=0x7f02006c;
-        public static final int selectable_background_justontime=0x7f02006d;
-        public static final int spinner_ab_default_justontime=0x7f02006e;
-        public static final int spinner_ab_disabled_justontime=0x7f02006f;
-        public static final int spinner_ab_focused_justontime=0x7f020070;
-        public static final int spinner_ab_pressed_justontime=0x7f020071;
-        public static final int spinner_background_ab_justontime=0x7f020072;
-        public static final int splash_screen=0x7f020073;
-        public static final int tab_indicator_ab_justontime=0x7f020074;
-        public static final int tab_selected_focused_justontime=0x7f020075;
-        public static final int tab_selected_justontime=0x7f020076;
-        public static final int tab_selected_pressed_justontime=0x7f020077;
-        public static final int tab_unselected_focused_justontime=0x7f020078;
-        public static final int tab_unselected_justontime=0x7f020079;
-        public static final int tab_unselected_pressed_justontime=0x7f02007a;
+        public static final int gradient_bg=0x7f020063;
+        public static final int gradient_bg_hover=0x7f020064;
+        public static final int ic_launcher=0x7f020065;
+        public static final int ic_launcher_perso=0x7f020066;
+        public static final int icon_station=0x7f020067;
+        public static final int list_focused_justontime=0x7f020068;
+        public static final int list_pressed_justontime=0x7f020069;
+        public static final int list_selector=0x7f02006a;
+        public static final int menu_dropdown_panel_justontime=0x7f02006b;
+        public static final int progress_bg_justontime=0x7f02006c;
+        public static final int progress_horizontal_justontime=0x7f02006d;
+        public static final int progress_primary_justontime=0x7f02006e;
+        public static final int progress_secondary_justontime=0x7f02006f;
+        public static final int selectable_background_justontime=0x7f020070;
+        public static final int spinner_ab_default_justontime=0x7f020071;
+        public static final int spinner_ab_disabled_justontime=0x7f020072;
+        public static final int spinner_ab_focused_justontime=0x7f020073;
+        public static final int spinner_ab_pressed_justontime=0x7f020074;
+        public static final int spinner_background_ab_justontime=0x7f020075;
+        public static final int splash_screen=0x7f020076;
+        public static final int tab_indicator_ab_justontime=0x7f020077;
+        public static final int tab_selected_focused_justontime=0x7f020078;
+        public static final int tab_selected_justontime=0x7f020079;
+        public static final int tab_selected_pressed_justontime=0x7f02007a;
+        public static final int tab_unselected_focused_justontime=0x7f02007b;
+        public static final int tab_unselected_justontime=0x7f02007c;
+        public static final int tab_unselected_pressed_justontime=0x7f02007d;
     }
     public static final class id {
         public static final int SearchButton=0x7f050044;
@@ -1133,7 +1136,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f050016;
         public static final int action_menu_presenter=0x7f050017;
         public static final int action_mode_close_button=0x7f050024;
-        public static final int action_settings=0x7f050048;
+        public static final int action_settings=0x7f05004c;
         public static final int activity_chooser_view_content=0x7f050025;
         public static final int always=0x7f05000b;
         public static final int beginning=0x7f050011;
@@ -1158,6 +1161,7 @@ containing a value of this type.
         public static final int imageView1=0x7f050047;
         public static final int imgLogo=0x7f05003d;
         public static final int listMode=0x7f050001;
+        public static final int list_image=0x7f050049;
         public static final int list_item=0x7f050029;
         public static final int middle=0x7f050012;
         public static final int never=0x7f050009;
@@ -1167,6 +1171,7 @@ containing a value of this type.
         public static final int progress_circular=0x7f050018;
         public static final int progress_horizontal=0x7f050019;
         public static final int radio=0x7f05002f;
+        public static final int route=0x7f05004a;
         public static final int routes=0x7f05003e;
         public static final int search_badge=0x7f050032;
         public static final int search_bar=0x7f050031;
@@ -1188,9 +1193,11 @@ containing a value of this type.
         public static final int tabMode=0x7f050002;
         public static final int testAddress=0x7f050041;
         public static final int testText=0x7f050043;
+        public static final int thumbnail=0x7f050048;
         public static final int timePicker1=0x7f05003c;
         public static final int title=0x7f05002b;
         public static final int top_action_bar=0x7f050020;
+        public static final int train_type=0x7f05004b;
         public static final int up=0x7f050021;
         public static final int useLogo=0x7f050003;
         public static final int withText=0x7f05000c;
@@ -1252,7 +1259,8 @@ containing a value of this type.
         public static final int fragment_first_page=0x7f03001c;
         public static final int fragment_new_route=0x7f03001d;
         public static final int fragment_next_trains=0x7f03001e;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001f;
+        public static final int list_row=0x7f03001f;
+        public static final int support_simple_spinner_dropdown_item=0x7f030020;
     }
     public static final class menu {
         public static final int first_page=0x7f0c0000;
