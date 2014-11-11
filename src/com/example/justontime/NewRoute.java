@@ -6,6 +6,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,8 +28,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -34,8 +42,8 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -64,6 +72,7 @@ public class NewRoute extends Fragment implements LocationListener{
 	// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 	private static final String ARG_PARAM1 = "param1";
 	private static final String ARG_PARAM2 = "param2";
+	private static Cursor cursor;
 	
 	public static final String PREFS_NAME = "routes_prefs";
 
@@ -550,6 +559,100 @@ public class NewRoute extends Fragment implements LocationListener{
 			return doc.toString();
 			
         }
+    }
+	
+	
+	/**get the current or a next day with the format  "mm/dd/yy". 0 is for today, 1 for tomorrow etc**/
+	private String getANextDay(int nb){
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.DATE, nb);
+		SimpleDateFormat df = new SimpleDateFormat("MM/dd/yy");
+		Date date = c.getTime();
+		String formattedDate = df.format(date);
+		return formattedDate;
+	}
+	
+	/****getting last Event of a date  ****/
+	private String getLastEventOfDate(String formattedDate){
+		Context context = getView().getContext();
+		
+		Uri l_eventUri;
+	    Calendar calendar = Calendar.getInstance();
+	    if (Build.VERSION.SDK_INT >= 8) {
+	        l_eventUri = Uri.parse("content://com.android.calendar/events");
+	    } else {
+	        l_eventUri = Uri.parse("content://calendar/events");
+	    }
+	    ContentResolver contentResolver = context.getContentResolver();
+
+	    String dtstart = "dtstart";
+	    String dtend = "dtend";
+
+	    String[] l_projection = new String[] { "title", "dtstart", "dtend" };
+
+	    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yy");
+	    Date dateCC;
+		
+	    try {
+			dateCC = formatter.parse(formattedDate);
+			calendar.setTime(dateCC);
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+	    long after = calendar.getTimeInMillis();
+
+	    SimpleDateFormat formatterr = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
+
+	    Calendar endOfDay = Calendar.getInstance();
+	    Date dateCCC;
+		try {
+			dateCCC = formatterr.parse(formattedDate +" 23:59:59");
+			endOfDay.setTime(dateCCC);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+	    cursor = contentResolver.query(l_eventUri, new String[] { "title",
+	            "dtstart", "dtend" }, "(" + dtstart + ">" + after + " and "
+	            + dtend + "<" + endOfDay.getTimeInMillis() + ")", null,
+	            "dtstart ASC");
+	    
+	    
+	    cursor.moveToLast();
+		String e_end;
+	    
+		int e_colEnd = cursor.getColumnIndex(l_projection[2]);
+		e_end = getDateTimeStr(cursor.getString(e_colEnd));
+		
+	    StringBuilder l_displayText = new StringBuilder();
+	    l_displayText.append( e_end );
+	    
+	    System.out.println(l_displayText);
+	    /*return the date of the last event with the format : 2014 nov. 11, 17:00:00*/
+	    return l_displayText.toString(); 
+    }
+	
+	/**utility functions in order to format the date**/
+	private static final String DATE_TIME_FORMAT = "yyyy MMM dd, HH:mm:ss";
+    public static String getDateTimeStr(int p_delay_min) {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT);
+		if (p_delay_min == 0) {
+			return sdf.format(cal.getTime());
+		} else {
+			Date l_time = cal.getTime();
+			l_time.setMinutes(l_time.getMinutes() + p_delay_min);
+			return sdf.format(l_time);
+		}
+	}
+    public static String getDateTimeStr(String p_time_in_millis) {
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT);
+    	Date l_time = new Date(Long.parseLong(p_time_in_millis));
+    	return sdf.format(l_time);
     }
 
 }

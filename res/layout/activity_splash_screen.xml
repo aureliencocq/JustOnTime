@@ -11,14 +11,6 @@
         android:contentDescription="splash screen"
         android:src="@drawable/splash_screen" />
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/imgLogo"
-        android:layout_alignParentLeft="false"
-        android:layout_marginBottom="31dp"
-        android:gravity="center_horizontal"
-        android:text="Never be late, but just on time"
-        android:textColor="#F5FAFA" />
+    
 
 </RelativeLayout>
