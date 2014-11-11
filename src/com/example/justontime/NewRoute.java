@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -49,6 +50,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -88,9 +90,10 @@ public class NewRoute extends Fragment implements LocationListener{
 	private double altitude;
 	private float accuracy;
 	
-	private Document schedule;
+	private ArrayList<Document> schedule = new ArrayList<Document>();
 	Station startStation;
 	Station destStation;
+	private boolean finished = false;
 	
 	private String[] DESTINATIONS;
 
@@ -389,23 +392,30 @@ public class NewRoute extends Fragment implements LocationListener{
 	        
 	        new LoadAllSchedule().execute();
 	        
-	        while(schedule == null){
+	        while(finished == false){
 	        	
 	        }         
 	        
-	        NodeList childNodes = schedule.getElementsByTagName("StopTime").item(0).getChildNodes();
-	        String hours = childNodes.item(2).getTextContent();
-	        String minutes = childNodes.item(3).getTextContent();
+	        if(schedule != null){
+		        for(int i = 0; i < schedule.size(); i++){
+		        	NodeList childNodes = schedule.get(i).getElementsByTagName("StopTime").item(0).getChildNodes();
+			        String hours = childNodes.item(2).getTextContent();
+			        String minutes = childNodes.item(3).getTextContent();			        
+		        }
+	        }
+	        
 	        
 	        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
 	        int indexPref = settings.getInt("indexPref", 0);
 	        SharedPreferences.Editor editor = settings.edit();
-	        String route = sourceStation.getName() + "-" + destStation.getName() + "-" + hours + "-" + minutes;
+	        String route = sourceStation.getName() + "-" + destStation.getName();
 	        editor.putString("route" + indexPref, route);
 	        indexPref++;
 	        editor.putInt("indexPref", indexPref);
 	        // Commit the edits!
 	        editor.commit();
+	        
+	        
 	        
 	        ((EditText)getView().findViewById(R.id.destination)).setText("");
 	        ((EditText)getView().findViewById(R.id.departure)).setText("");
@@ -417,7 +427,7 @@ public class NewRoute extends Fragment implements LocationListener{
 		}
 	}
 	
-	public void setSchedule(Document doc){
+	public void setSchedule(ArrayList<Document> doc){
 		schedule = doc;
 	}		
 	
@@ -485,7 +495,7 @@ public class NewRoute extends Fragment implements LocationListener{
 		this.destStation = destStation;
 	}
 
-	public Document getSchedule() {
+	public ArrayList<Document> getSchedule() {
 		return schedule;
 	}
 
@@ -497,68 +507,90 @@ public class NewRoute extends Fragment implements LocationListener{
          * getting All products from url
          * @return 
          * */
-        protected String doInBackground(String... args) {        	
-        	DefaultHttpClient httpClient = new DefaultHttpClient(); 
-        	StringBuilder sb = new StringBuilder();
-        	sb.append("http://ms.api.ter-sncf.com/?action=nextdeparture&StopAreaExternalCode=");
-        	sb.append(getStartStation().getCode());
-        	sb.append("&DestinationExternalCode=");
-        	sb.append(getDestStation().getCode());
-        	sb.append("&Time=17|15");
-        	//sb.append(getTime());
-        	sb.append("&Date=2014|11|15");
-        	//sb.append(getDate());        	
-        	sb.append("&nbstop=1");
-        	
-            HttpGet httpGet = null;		
-            URL url;
-			try {
-				url = new URL(sb.toString());
-				URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());	            
-	            httpGet = new HttpGet(uri);
-			} catch (MalformedURLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}            
+        protected String doInBackground(String... args) {
+        	for(int i = 0; i < 5; i++){
+        		String day = getANextDay(i);
+            	String fullDate = getLastEventOfDate(day);
+            	
+            	if(fullDate != null){
+            		String date = fullDate.split(",")[0];
+                	String time = fullDate.split(",")[1];
+                	
+                	DefaultHttpClient httpClient = new DefaultHttpClient(); 
+                	StringBuilder sb = new StringBuilder();
+                	sb.append("http://ms.api.ter-sncf.com/?action=nextdeparture&StopAreaExternalCode=");
+                	sb.append(getStartStation().getCode());
+                	sb.append("&DestinationExternalCode=");
+                	sb.append(getDestStation().getCode());
+                	sb.append("&Time=");
+                	sb.append(formatTime(time));
+                	sb.append("&Date=");
+                	sb.append(formatDate(date));        	
+                	sb.append("&nbstop=1");
+                	
+                    HttpGet httpGet = null;		
+                    URL url;
+        			try {
+        				url = new URL(sb.toString());
+        				URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());	            
+        	            httpGet = new HttpGet(uri);
+        			} catch (MalformedURLException e1) {
+        				// TODO Auto-generated catch block
+        				e1.printStackTrace();
+        			} catch (URISyntaxException e) {
+        				// TODO Auto-generated catch block
+        				e.printStackTrace();
+        			}            
 
-            HttpResponse httpResponse;
-            InputStream is = null;
-			try {
-				httpResponse = httpClient.execute(httpGet);
-				HttpEntity httpEntity = httpResponse.getEntity();
-	            is = httpEntity.getContent();
-			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			 
-			DocumentBuilder builder;
-			Document doc = null;
-			try {
-				builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-				doc = builder.parse(is);
-				doc.getDocumentElement().normalize();
-				setSchedule(doc);				
-			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-				catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
-			return doc.toString();
+                    HttpResponse httpResponse;
+                    InputStream is = null;
+        			try {
+        				httpResponse = httpClient.execute(httpGet);
+        				HttpEntity httpEntity = httpResponse.getEntity();
+        	            is = httpEntity.getContent();
+        			} catch (ClientProtocolException e) {
+        				// TODO Auto-generated catch block
+        				e.printStackTrace();
+        			} catch (IOException e) {
+        				// TODO Auto-generated catch block
+        				e.printStackTrace();
+        			}
+        			 
+        			DocumentBuilder builder;
+        			Document doc = null;
+        			try {
+        				builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        				doc = builder.parse(is);
+        				doc.getDocumentElement().normalize();
+        				schedule.add(doc);			
+        			} catch (ParserConfigurationException e) {
+        				// TODO Auto-generated catch block
+        				e.printStackTrace();
+        			}
+        				catch (SAXException e) {
+        				// TODO Auto-generated catch block
+        				e.printStackTrace();
+        			} catch (IOException e) {
+        				// TODO Auto-generated catch block
+        				e.printStackTrace();
+        			}
+            	}
+            	
+        	}
+        		
+        	finished = true;
+        	return schedule.toString();
+			
 			
         }
+
+		private String formatDate(String date) {
+			return date.split(" ")[0] + "|" + date.split(" ")[1] + "|" + date.split(" ")[2];	
+		}
+
+		private String formatTime(String time) {
+			return time.split(":")[0] + "|" + time.split(":")[1];						
+		}
     }
 	
 	
@@ -621,23 +653,27 @@ public class NewRoute extends Fragment implements LocationListener{
 	            + dtend + "<" + endOfDay.getTimeInMillis() + ")", null,
 	            "dtstart ASC");
 	    
-	    
-	    cursor.moveToLast();
-		String e_end;
-	    
-		int e_colEnd = cursor.getColumnIndex(l_projection[2]);
-		e_end = getDateTimeStr(cursor.getString(e_colEnd));
-		
-	    StringBuilder l_displayText = new StringBuilder();
-	    l_displayText.append( e_end );
-	    
-	    System.out.println(l_displayText);
-	    /*return the date of the last event with the format : 2014 nov. 11, 17:00:00*/
-	    return l_displayText.toString(); 
+	    if((cursor != null) && (cursor.getCount() > 0)){
+	    	cursor.moveToLast();
+			String e_end;
+		    
+			int e_colEnd = cursor.getColumnIndex(l_projection[2]);
+			e_end = getDateTimeStr(cursor.getString(e_colEnd));
+			
+		    StringBuilder l_displayText = new StringBuilder();
+		    l_displayText.append( e_end );
+		    
+		    System.out.println(l_displayText);
+		    /*return the date of the last event with the format : 2014 nov. 11, 17:00:00*/
+		    return l_displayText.toString(); 
+	    }
+	    else{
+	    	return null;
+	    }
     }
 	
 	/**utility functions in order to format the date**/
-	private static final String DATE_TIME_FORMAT = "yyyy MMM dd, HH:mm:ss";
+	private static final String DATE_TIME_FORMAT = "yyyy MM dd,HH:mm:ss";
     public static String getDateTimeStr(int p_delay_min) {
 		Calendar cal = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT);
