@@ -1,12 +1,18 @@
 package com.example.justontime;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 /**
  * A simple {@link Fragment} subclass. Activities that contain this fragment
@@ -26,6 +32,8 @@ public class NextTrains extends Fragment {
 	private String mParam2;
 
 	private OnFragmentInteractionListener mListener;
+	
+	ListView listView ;
 
 	/**
 	 * Use this factory method to create a new instance of this fragment using
@@ -64,8 +72,37 @@ public class NextTrains extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-		return inflater
-				.inflate(R.layout.fragment_next_trains, container, false);
+		View v = inflater.inflate(R.layout.fragment_next_trains, container, false);
+		listView = (ListView) v.findViewById(R.id.trains);
+		
+		// TODO Add list items.
+	    
+	    /*LazyAdapter adapter = new LazyAdapter(this.getActivity(), fullRoute);
+
+
+        // Assign adapter to ListView
+        listView.setAdapter(adapter); 
+		
+        // ListView Item Click Listener
+        listView.setOnItemClickListener(new OnItemClickListener() {
+
+              @Override
+              public void onItemClick(AdapterView<?> parent, View view,
+                 int position, long id) {
+                
+               
+               // ListView Clicked item value
+               String  itemValue = (String) listView.getItemAtPosition(position);
+                  
+               String departure = "gare de " + itemValue.split(" - ")[0];
+               String destination = "gare de " + itemValue.split(" - ")[1];
+               
+               searchAddress(departure, destination);
+              }
+
+         }); */
+        
+		return v;
 	}
 
 	// TODO: Rename method, update argument and hook method into UI event

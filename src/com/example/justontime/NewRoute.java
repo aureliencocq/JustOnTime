@@ -91,6 +91,8 @@ public class NewRoute extends Fragment implements LocationListener{
 	private float accuracy;
 	
 	private ArrayList<Document> schedule = new ArrayList<Document>();
+	private ArrayList<String> times = new ArrayList<String>();
+	private ArrayList<String> dates = new ArrayList<String>();
 	Station startStation;
 	Station destStation;
 	private boolean finished = false;
@@ -395,15 +397,12 @@ public class NewRoute extends Fragment implements LocationListener{
 	        while(finished == false){
 	        	
 	        }         
-	        
-	        if(schedule != null){
-		        for(int i = 0; i < schedule.size(); i++){
-		        	NodeList childNodes = schedule.get(i).getElementsByTagName("StopTime").item(0).getChildNodes();
-			        String hours = childNodes.item(2).getTextContent();
-			        String minutes = childNodes.item(3).getTextContent();			        
-		        }
-	        }
-	        
+	        	        
+	        for(int i = 0; i < schedule.size(); i++){
+	        	NodeList childNodes = schedule.get(i).getElementsByTagName("StopTime").item(0).getChildNodes();
+		        times.add(childNodes.item(2).getTextContent() + ":" + childNodes.item(3).getTextContent());			        
+		        
+	        }	        	        
 	        
 	        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
 	        int indexPref = settings.getInt("indexPref", 0);
@@ -512,10 +511,10 @@ public class NewRoute extends Fragment implements LocationListener{
         		String day = getANextDay(i);
             	String fullDate = getLastEventOfDate(day);
             	
-            	if(fullDate != null){
+            	if(fullDate != null){            		
             		String date = fullDate.split(",")[0];
                 	String time = fullDate.split(",")[1];
-                	
+                	dates.add(formatDate(date));
                 	DefaultHttpClient httpClient = new DefaultHttpClient(); 
                 	StringBuilder sb = new StringBuilder();
                 	sb.append("http://ms.api.ter-sncf.com/?action=nextdeparture&StopAreaExternalCode=");

@@ -3,4 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+
+    <ListView
+      android:id="@+id/trains"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:divider="#A1006B"
+      android:dividerHeight="1dp"
+      android:listSelector="@drawable/list_selector">
+    </ListView>
+
 </RelativeLayout>
