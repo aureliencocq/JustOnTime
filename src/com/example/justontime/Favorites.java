@@ -69,6 +69,8 @@ public class Favorites extends Fragment {
 	ListView listView ;
 	Station destStation;
 	Station depStation;
+	private ArrayList<String> times = new ArrayList<String>();
+	private ArrayList<String> dates = new ArrayList<String>();
 	private ArrayList<Document> schedule = new ArrayList<Document>();
 	private boolean finished = false;
 	private static Cursor cursor;
@@ -171,21 +173,22 @@ public class Favorites extends Fragment {
 	        	
 	        }         
 	        
-	        if(schedule != null){
-		        for(int i = 0; i < schedule.size(); i++){
-		        	NodeList childNodes = schedule.get(i).getElementsByTagName("StopTime").item(0).getChildNodes();
-			        String hours = childNodes.item(2).getTextContent();
-			        String minutes = childNodes.item(3).getTextContent();			        
-		        }
-	        }
-	        
 	        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
 	        int indexPref = settings.getInt("indexPref", 0);
 	        SharedPreferences.Editor editor = settings.edit();
+	        
+	        for(int i = 0; i < schedule.size(); i++){
+	        	NodeList childNodes = schedule.get(i).getElementsByTagName("StopTime").item(0).getChildNodes();
+		        times.add(childNodes.item(2).getTextContent() + "h" + childNodes.item(3).getTextContent());			        
+		        editor.putString("time" + i, times.get(i));
+		        editor.putString("date" + i, dates.get(i));
+	        }	
+	        
 	        String route = sourceStation.getName() + "-" + destStation.getName();
 	        editor.putString("route" + indexPref, route);
 	        indexPref++;
 	        editor.putInt("indexPref", indexPref);
+	        editor.putInt("indexTrain", schedule.size());
 	        // Commit the edits!
 	        editor.commit();
 	        
@@ -273,7 +276,7 @@ public class Favorites extends Fragment {
             	if(fullDate != null){
             		String date = fullDate.split(",")[0];
                 	String time = fullDate.split(",")[1];
-                	
+                	dates.add(date);
                 	DefaultHttpClient httpClient = new DefaultHttpClient(); 
                 	StringBuilder sb = new StringBuilder();
                 	sb.append("http://ms.api.ter-sncf.com/?action=nextdeparture&StopAreaExternalCode=");

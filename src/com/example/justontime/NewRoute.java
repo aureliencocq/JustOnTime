@@ -396,21 +396,24 @@ public class NewRoute extends Fragment implements LocationListener{
 	        
 	        while(finished == false){
 	        	
-	        }         
-	        	        
-	        for(int i = 0; i < schedule.size(); i++){
-	        	NodeList childNodes = schedule.get(i).getElementsByTagName("StopTime").item(0).getChildNodes();
-		        times.add(childNodes.item(2).getTextContent() + ":" + childNodes.item(3).getTextContent());			        
-		        
-	        }	        	        
+	        }         	        	        	                	      
 	        
 	        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
 	        int indexPref = settings.getInt("indexPref", 0);
 	        SharedPreferences.Editor editor = settings.edit();
+	        
+	        for(int i = 0; i < schedule.size(); i++){
+	        	NodeList childNodes = schedule.get(i).getElementsByTagName("StopTime").item(0).getChildNodes();
+		        times.add(childNodes.item(2).getTextContent() + "h" + childNodes.item(3).getTextContent());			        
+		        editor.putString("time" + i, times.get(i));
+		        editor.putString("date" + i, dates.get(i));
+	        }	
+	        
 	        String route = sourceStation.getName() + "-" + destStation.getName();
 	        editor.putString("route" + indexPref, route);
 	        indexPref++;
 	        editor.putInt("indexPref", indexPref);
+	        editor.putInt("indexTrain", schedule.size());
 	        // Commit the edits!
 	        editor.commit();
 	        
@@ -514,7 +517,7 @@ public class NewRoute extends Fragment implements LocationListener{
             	if(fullDate != null){            		
             		String date = fullDate.split(",")[0];
                 	String time = fullDate.split(",")[1];
-                	dates.add(formatDate(date));
+                	dates.add(date);
                 	DefaultHttpClient httpClient = new DefaultHttpClient(); 
                 	StringBuilder sb = new StringBuilder();
                 	sb.append("http://ms.api.ter-sncf.com/?action=nextdeparture&StopAreaExternalCode=");

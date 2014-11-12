@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,8 @@ public class NextTrains extends Fragment {
 	// TODO: Rename and change types of parameters
 	private String mParam1;
 	private String mParam2;
-
+	
+	public static final String PREFS_NAME = "routes_prefs";
 	private OnFragmentInteractionListener mListener;
 	
 	ListView listView ;
@@ -75,9 +77,19 @@ public class NextTrains extends Fragment {
 		View v = inflater.inflate(R.layout.fragment_next_trains, container, false);
 		listView = (ListView) v.findViewById(R.id.trains);
 		
-		// TODO Add list items.
+		SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+	    int size = settings.getInt("indexTrain", 0);
+	    ArrayList<String> fullDate = new ArrayList<String>();
+	    for(int i = 0; i < size; i++){
+	    	String str = settings.getString("date" + i, "Pas de date");
+	    	String time = settings.getString("time" + i, "Pas d'heure");	    	
+		    String[] train = str.split(" ");
+		    Log.d("debug : ", train[0]);
+		    String formatDate = train[2] + " " + getMonth(Integer.parseInt(train[1])) + " " + train[0] + " à " + time;		    
+		    fullDate.add(formatDate);
+	    }
 	    
-	    /*LazyAdapter adapter = new LazyAdapter(this.getActivity(), fullRoute);
+	    LazyAdapter adapter = new LazyAdapter(this.getActivity(), fullDate);
 
 
         // Assign adapter to ListView
@@ -89,20 +101,32 @@ public class NextTrains extends Fragment {
               @Override
               public void onItemClick(AdapterView<?> parent, View view,
                  int position, long id) {
-                
-               
-               // ListView Clicked item value
-               String  itemValue = (String) listView.getItemAtPosition(position);
-                  
-               String departure = "gare de " + itemValue.split(" - ")[0];
-               String destination = "gare de " + itemValue.split(" - ")[1];
-               
-               searchAddress(departure, destination);
+                                              
               }
 
-         }); */
+         }); 
         
 		return v;
+	}
+
+	private String getMonth(int month) {
+		String monthString;
+		switch (month) {
+	        case 1:  monthString = "Janvier";       break;
+	        case 2:  monthString = "Février";      break;
+	        case 3:  monthString = "Mars";         break;
+	        case 4:  monthString = "Avril";         break;
+	        case 5:  monthString = "Mai";           break;
+	        case 6:  monthString = "Juin";          break;
+	        case 7:  monthString = "Juillet";          break;
+	        case 8:  monthString = "Août";        break;
+	        case 9:  monthString = "Septembre";     break;
+	        case 10: monthString = "Octobre";       break;
+	        case 11: monthString = "Novembre";      break;
+	        case 12: monthString = "Decembre";      break;
+	        default: monthString = "Mois invalide"; break;
+		}
+		return monthString;
 	}
 
 	// TODO: Rename method, update argument and hook method into UI event
